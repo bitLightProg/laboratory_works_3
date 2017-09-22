@@ -120,6 +120,9 @@ void Fraction::print() {
 }
 
 Fraction Fraction::operator=(const Fraction &a) {
+	if (this == &a) {
+		return *this;
+	}
 	if (name != nullptr) {
 		delete[] name;
 	}
@@ -152,7 +155,7 @@ Fraction operator-(const Fraction &a, const Fraction &b) {
 	return f;
 }
 
-Fraction Fraction::operator++() {
+Fraction& Fraction::operator++() {
 	numerator += denominator;
 	concat(name, " + ");
 	concat(name, "один");
@@ -160,10 +163,11 @@ Fraction Fraction::operator++() {
 }
 
 Fraction Fraction::operator++(int) {
+	Fraction temp(*this);
 	numerator += denominator;
 	concat(name, " + ");
 	concat(name, "один");
-	return *this;
+	return temp;
 }
 
 Fraction::operator float() const {

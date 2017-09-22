@@ -71,31 +71,7 @@ const char* Fraction::get_name() const {
 		std::cout << "Wrong number" << std::endl;
 		return nullptr;
 	}
-	/*const int max_num = 22;
-	unsigned int ln_n = strlen(name);
-	char *ch = new char[max_num + ln_n + 4];
-	_itoa(numerator, ch, 10);
-	unsigned int ln = strlen(ch);
 
-	if (denominator != 1 && numerator != 0) {
-	ch[ln] = '/';
-	_itoa(denominator, ch + ln + 1, 10);
-	ln = strlen(ch);
-	}
-
-	ch[ln] = ' ';
-	ch[ln + 1] = '(';
-	memcpy(ch + ln + 2, name, ln_n + 1);
-	ln = strlen(ch);
-	ch[ln] = ')';
-	ch[ln + 1] = '\0';
-
-	char *returning = new char[ln + 3];
-	memcpy(returning, ch, ln + 3);
-
-	delete[] ch;
-
-	return returning;*/
 	return name;
 }
 
@@ -115,7 +91,6 @@ void Fraction::print() {
 		}
 
 		std::cout << "value = " << ch << " (" << n << ")" << std::endl;
-		/*delete[] ch;*/
 	}
 }
 
@@ -243,7 +218,7 @@ void Fraction::read(std::istream &is) {
 	int i = 0;
 	std::streampos s = is.tellg();;
 	while ((ch = is.get()) != '\0') {
-			i++;
+		i++;
 	}
 
 	is.seekg(s);

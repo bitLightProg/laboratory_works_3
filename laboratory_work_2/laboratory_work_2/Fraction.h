@@ -15,7 +15,7 @@ public:
 	Fraction operator=(const Fraction &a);
 	Fraction operator+(const Fraction &a);
 	friend Fraction operator-(const Fraction &a, const Fraction &b);
-	Fraction operator++();
+	Fraction& operator++();
 	Fraction operator++(int);
 	operator float() const;
 	operator double() const;

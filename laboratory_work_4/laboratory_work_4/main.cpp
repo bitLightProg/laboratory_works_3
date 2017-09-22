@@ -14,42 +14,13 @@
 ввод и вывод в удобной фоpме объектов классов:
 •	вывод в текстовый файл;
 •	ввод/вывод из двоичного файла / в двоичный файл.
+
+Для классов предыдущей лабораторной работы реализовать иерархию, изменяя отдельные методы
+и добавляя члены-данные (по усмотрению студента и преподавателя).
+В иерархию должно входить 2 производных класса. Один из методов должен быть виртуальным.
 */
 #include <iostream>
-#include <cstdlib>
-#include <fstream>
-#include <Windows.h>
-
-#include "Fraction.h"
 
 int main() {
-	SetConsoleCP(1251);
-	SetConsoleOutputCP(1251);
-
-	Fraction a;
-	Fraction f(1, 1, "один");
-	Fraction b(f);
-	Fraction c(1115, 213, "тысяча сто пятнадцать двухсот тринадцатых");
-
-	std::ofstream output("out.txt");
-
-	output << c << std::endl;
-	output << c << std::endl;
-	output.close();
-	std::ifstream input("out.txt");
-	input >> a >> a;
-	input.close();
-	std::cout << a;
-
-	std::ofstream output_bin("out.bin", std::ios_base::binary);
-	c.write(output_bin);
-	c.write(output_bin);
-	output_bin.close();
-	std::ifstream input_bin("out.bin", std::ios_base::binary);
-	a.read(input_bin);
-	a.read(input_bin);
-	input_bin.close();
-	std::cout << a << std::endl;
-	system("pause");
 	return 0;
 }

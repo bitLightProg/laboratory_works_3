@@ -1,4 +1,4 @@
-#include <iostream>
+ï»¿#include <iostream>
 #include <fstream>
 #include <ctime>
 #include <Windows.h>
@@ -27,12 +27,12 @@ void write_to_file(std::ostream &os, float **arr, int n) {
 int main() {
 	SetConsoleCP(1251);
 	SetConsoleOutputCP(1251);
-	std::cout << "Ââåäèòå ðàçìåðíîñòü ìàòðèöû." << std::endl;
+	std::cout << "Ð’Ð²ÐµÐ´Ð¸Ñ‚Ðµ Ñ€Ð°Ð·Ð¼ÐµÑ€Ð½Ð¾ÑÑ‚ÑŒ Ð¼Ð°Ñ‚Ñ€Ð¸Ñ†Ñ‹." << std::endl;
 	int n;
 	std::cin >> n;
 	SYSTEMTIME st1, st2;
 	GetLocalTime(&st1);
-	/*std::cout << "Ââåäèòå ýëåìåíòû ìàòðèöû." << std::endl;*/
+	/*std::cout << "Ð’Ð²ÐµÐ´Ð¸Ñ‚Ðµ ÑÐ»ÐµÐ¼ÐµÐ½Ñ‚Ñ‹ Ð¼Ð°Ñ‚Ñ€Ð¸Ñ†Ñ‹." << std::endl;*/
 	srand(time(NULL));
 	float **arr = new float*[n];
 	for (int i = 0; i < n; ++i) {
@@ -76,10 +76,10 @@ int main() {
 	}
 	GetLocalTime(&s2);
 	GetLocalTime(&st2);
-	std::cout << "Îïðåäåëèòåëü: "<< p << std::endl;
-	std::cout << "Âðåìÿ: " << ((s2.wMinute - s1.wMinute) * 60 + s2.wSecond - s1.wSecond) * 1000
+	std::cout << "ÐžÐ¿Ñ€ÐµÐ´ÐµÐ»Ð¸Ñ‚ÐµÐ»ÑŒ: "<< p << std::endl;
+	std::cout << "Ð’Ñ€ÐµÐ¼Ñ: " << ((s2.wMinute - s1.wMinute) * 60 + s2.wSecond - s1.wSecond) * 1000
 		+ s2.wMilliseconds - s1.wMilliseconds << std::endl;
-	std::cout << "Âðåìÿ ïðîãðàììû ïîñëå ââîäà(ñî âðåìåíåì ñîõðàíåíèÿ â ôàéë): "
+	std::cout << "Ð’Ñ€ÐµÐ¼Ñ Ð¿Ñ€Ð¾Ð³Ñ€Ð°Ð¼Ð¼Ñ‹ Ð¿Ð¾ÑÐ»Ðµ Ð²Ð²Ð¾Ð´Ð°(ÑÐ¾ Ð²Ñ€ÐµÐ¼ÐµÐ½ÐµÐ¼ ÑÐ¾Ñ…Ñ€Ð°Ð½ÐµÐ½Ð¸Ñ Ð² Ñ„Ð°Ð¹Ð»): "
 		<< ((st2.wMinute - st1.wMinute) * 60 + st2.wSecond - st1.wSecond) * 1000
 		+ st2.wMilliseconds - st1.wMilliseconds << std::endl;
 	system("pause");
