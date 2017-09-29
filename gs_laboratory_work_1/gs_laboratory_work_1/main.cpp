@@ -32,14 +32,15 @@ int main() {
 	std::cin >> n;
 	SYSTEMTIME st1, st2;
 	GetLocalTime(&st1);
-	/*std::cout << "Введите элементы матрицы." << std::endl;*/
+	std::cout << "Введите элементы матрицы." << std::endl;
 	srand(time(NULL));
 	float **arr = new float*[n];
 	for (int i = 0; i < n; ++i) {
 		arr[i] = new float[n];
 		for (int j = 0; j < n; ++j) {
-			arr[i][j] = 1 + rand() % 10;
-			rand() % 2 ? arr[i][j]: arr[i][j] = -arr[i][j];
+			std::cin >> arr[i][j];
+			/*arr[i][j] = 1 + rand() % 10;
+			rand() % 2 ? arr[i][j]: arr[i][j] = -arr[i][j];*/
 		}
 	}
 	std::cout << std::endl;
@@ -50,11 +51,11 @@ int main() {
 	float p = 1;
 	int position = 0;
 	while (position != n) {
-		/*print(arr, n);*/
-		p *= arr[position][position];
+		print(arr, n);
+		/*p *= arr[position][position];*/
 		for (int i = position; i < n; ++i) {
 			float beg = arr[i][position];
-			/*p *= beg;*/
+			p *= beg;
 			if (beg == 0) {
 				continue;
 			}
