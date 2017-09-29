@@ -1,4 +1,4 @@
-
+ï»¿
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 
@@ -183,10 +183,10 @@ __global__ void sub(float* arr, int n, int position) {
 int main() {
 	SetConsoleCP(1251);
 	SetConsoleOutputCP(1251);
-	std::cout << "Ââåäèòå ðàçìåðíîñòü ìàòðèöû." << std::endl;
+	std::cout << "Ð’Ð²ÐµÐ´Ð¸Ñ‚Ðµ Ñ€Ð°Ð·Ð¼ÐµÑ€Ð½Ð¾ÑÑ‚ÑŒ Ð¼Ð°Ñ‚Ñ€Ð¸Ñ†Ñ‹." << std::endl;
 	int n;
 	std::cin >> n;
-	std::cout << "Ââåäèòå ýëåìåíòû ìàòðèöû." << std::endl;
+	std::cout << "Ð’Ð²ÐµÐ´Ð¸Ñ‚Ðµ ÑÐ»ÐµÐ¼ÐµÐ½Ñ‚Ñ‹ Ð¼Ð°Ñ‚Ñ€Ð¸Ñ†Ñ‹." << std::endl;
 	srand(time(NULL));
 	float *arr = new float[n*n];
 	for (int i = 0; i < n; ++i) {
@@ -234,8 +234,8 @@ int main() {
 	cudaFree(dev_arr);
 	cudaFree(dev_p);
 	
-	std::cout << "Îïðåäåëèòåëü: " << p << std::endl;
-	std::cout << "Âðåìÿ: " << ((s2.wMinute - s1.wMinute) * 60 + s2.wSecond - s1.wSecond) * 1000
+	std::cout << "ÐžÐ¿Ñ€ÐµÐ´ÐµÐ»Ð¸Ñ‚ÐµÐ»ÑŒ: " << p << std::endl;
+	std::cout << "Ð’Ñ€ÐµÐ¼Ñ: " << ((s2.wMinute - s1.wMinute) * 60 + s2.wSecond - s1.wSecond) * 1000
 		+ s2.wMilliseconds - s1.wMilliseconds << std::endl;
 	system("pause");
 	return 0;
