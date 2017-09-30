@@ -130,12 +130,12 @@ void print(float* arr, int n) {
 		}
 		std::cout << std::endl;
 	}
-	std::cout << std::endl;
+	/*std::cout << std::endl;*/
 }
 
 //void rutine(float* arr, int n, int& position, float& p);
 
-
+__device__ unsigned int block_id = -1;
 __global__ void div(float* arr, int n, int position, float* p) {
 	__shared__ float beg;
 	beg = 0;
@@ -143,7 +143,12 @@ __global__ void div(float* arr, int n, int position, float* p) {
 		beg = arr[(n)*(blockIdx.x + position) + position];
 		/*if (beg == 3)
 			return;*/
+		/*__threadfence();*/
+		int current_index = blockIdx.x;
+		while (block_id != current_index - 1);
 		*p *= beg;
+		++block_id;
+		/*__threadfence();*/
 	}
 	/*__syncthreads();*/
 	if (beg == 0) {
@@ -171,6 +176,7 @@ __global__ void div(float* arr, int n, int position, float* p) {
 
 }
 __global__ void sub(float* arr, int n, int position) {
+	block_id = -1;
 	unsigned int x = blockIdx.x + position;
 	unsigned int y = 1024 * 1024 * (threadIdx.z) + 1024 * (threadIdx.y) + (threadIdx.x) + position;
 	if (x >= n || y >= n) {
@@ -213,17 +219,17 @@ int main() {
 	GetLocalTime(&s1);
 	while (position != n) {
 		dim3 block(1 + (n - position) % 1024, 1/*1 + ((int)(n-position) / 1024 % 1024)*/, 1/*1 + (int)(n - position) / 1024 / 1024*/);
-		dim3 grid((n/* - position*/), 1, 1);
+		dim3 grid((n - position), 1, 1);
 		div<<<grid, block>>>(dev_arr, n, position, dev_p);
-		cudaMemcpy(arr, dev_arr, size * sizeof(float), cudaMemcpyDeviceToHost);
+		/*cudaMemcpy(arr, dev_arr, size * sizeof(float), cudaMemcpyDeviceToHost);
 		print(arr, n);
 		cudaMemcpy(&p, dev_p, sizeof(float), cudaMemcpyDeviceToHost);
-		std::cout << p << std::endl;
+		std::cout << p << std::endl << std::endl;*/
 		sub<<<grid, block>>>(dev_arr, n, position);
-		cudaMemcpy(arr, dev_arr, size * sizeof(float), cudaMemcpyDeviceToHost);
+		/*cudaMemcpy(arr, dev_arr, size * sizeof(float), cudaMemcpyDeviceToHost);
 		print(arr, n);
 		cudaMemcpy(&p, dev_p, sizeof(float), cudaMemcpyDeviceToHost);
-		std::cout << p << std::endl;
+		std::cout << p << std::endl << std::endl;*/
 		/*print(arr, n);
 		rutine(arr, n, position, p);*/
 		++position;
