@@ -144,7 +144,10 @@ __global__ void div(float* arr, int n, int position, float* p) {
 		/*if (beg == 3)
 			return;*/
 		/*__threadfence();*/
+		
 		int current_index = blockIdx.x;
+		if (beg == 0 && current_index != 0)
+			return;
 		while (block_id != current_index - 1);
 		*p *= beg;
 		++block_id;
@@ -177,13 +180,29 @@ __global__ void div(float* arr, int n, int position, float* p) {
 }
 __global__ void sub(float* arr, int n, int position) {
 	block_id = -1;
-	unsigned int x = blockIdx.x + position;
+	__shared__ float beg;
+	beg = 0;
+	if (threadIdx.x == 0) {
+		beg = arr[(n)*(blockIdx.x + position) + position];
+	}
+	/*unsigned int x = blockIdx.x + position;
 	unsigned int y = 1024 * 1024 * (threadIdx.z) + 1024 * (threadIdx.y) + (threadIdx.x) + position;
 	if (x >= n || y >= n) {
 		return;
 	}
 
-	arr[y*(n)+x] -= arr[x + position*n];
+	arr[y*(n)+x] -= arr[x + position*n];*/
+	unsigned int x = 1024 * 1024 * (threadIdx.z) + 1024 * (threadIdx.y) + (threadIdx.x) + position;
+	unsigned int y = blockIdx.x + position;
+	__syncthreads();
+	if ((x >= n) || (y >= n)) {
+		return;
+	}
+	if (beg == 0) {
+		return;
+	}
+	arr[y*(n)+x] -= arr[n*position + x];
+
 }
 
 int main() {
