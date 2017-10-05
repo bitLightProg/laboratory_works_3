@@ -25,8 +25,9 @@ public:
 	void read(std::istream &is);
 	void write(std::ostream &os);
 
-private:
-	void print();
+	virtual void print() const;
+
+protected:
 	inline Fraction addition(const Fraction &a);
 	static inline void concat(char *&a, const char *b);
 

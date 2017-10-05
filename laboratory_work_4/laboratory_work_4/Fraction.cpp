@@ -9,7 +9,7 @@ Fraction::Fraction(int nu, unsigned int d, const char *n) : numerator(nu), denom
 	name = new char[ln + 1];
 	memcpy(name, n, ln + 1);
 
-	std::cout << "In Fraction(int, int, const char*)" << std::endl;
+	std::cout << "In Fraction(int, uint, const char*)" << std::endl;
 }
 
 Fraction::Fraction(const Fraction &f) : numerator(f.numerator), denominator(f.denominator) {
@@ -75,7 +75,7 @@ const char* Fraction::get_name() const {
 	return name;
 }
 
-void Fraction::print() {
+void Fraction::print() const {
 	const char *n = get_name();
 	if (n != nullptr) {
 

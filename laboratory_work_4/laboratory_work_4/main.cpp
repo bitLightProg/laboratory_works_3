@@ -20,7 +20,25 @@
 В иерархию должно входить 2 производных класса. Один из методов должен быть виртуальным.
 */
 #include <iostream>
+#include <Windows.h>
+
+#include "CeilFraction.h"
+#include "FloorFraction.h"
 
 int main() {
+	SetConsoleCP(1251);
+	SetConsoleOutputCP(1251);
+
+	CeilFraction a;
+	CeilFraction b(1513, 217, "тысяча пятьсот тринадцать двухсот семнадцатых");
+	FloorFraction c;
+	FloorFraction d(1513, 217, "тысяча пятьсот тринадцать двухсот семнадцатых");
+
+	a.print();
+	b.print();
+	c.print();
+	d.print();
+
+	system("pause");
 	return 0;
 }
