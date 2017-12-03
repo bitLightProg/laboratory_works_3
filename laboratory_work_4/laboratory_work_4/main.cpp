@@ -22,6 +22,7 @@
 #include <iostream>
 #include <Windows.h>
 
+#include "Fraction.h"
 #include "CeilFraction.h"
 #include "FloorFraction.h"
 
@@ -38,6 +39,11 @@ int main() {
 	b.print();
 	c.print();
 	d.print();
+
+	Fraction* e = &b;
+	e->print();
+	e = &d;
+	e->print();
 
 	system("pause");
 	return 0;

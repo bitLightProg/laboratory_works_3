@@ -21,24 +21,17 @@ int main() {
 	SetConsoleCP(1251);
 	SetConsoleOutputCP(1251);
 
-	//Fraction a;
 	Fraction f(1, 1, "один");
 	Fraction b(f);
 	Fraction c(1115, 213, "тысяча сто пятнадцать двухсот тринадцатых");
 
-	(f + b).print();
-	//(f - f).print();
-	//(b - c).print();
-	//std::complex<int> a;
+	(f - b).print();
 
 	(c + b++).print();
 	b.print();
 	(++b).print();
-	
 
-	//std::cout << (double)c << std::endl;
-	/*b = b;
-	b.print();*/
+	std::cout << (double)c << std::endl;
 	
 	system("pause");
 	return 0;

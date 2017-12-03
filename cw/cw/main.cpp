@@ -12,7 +12,7 @@ Search - поиск записи в файле.
 4.	Файл индексов имеет страничную структуру. Страницы содержат индексы записей и имеют фиксированный размер.
 5.	Чтение и запись в файл индексов ведется постранично.
 6.	Тестирование файловой структуры ведется для различных значений параметров:
-	N – число записей в файле данных, N = 103, 104, 105, 106,
+	N – число записей в файле данных, N = 10^3, 10^4, 10^5, 10^6,
 	M – число индексов на странице файла индексов, M = 10,100, 1000.
 7.	Число обращений к блокам файла индексов в процессе выполнения операций должно соответствовать:
 	для хешированного файла  - N/(M*K), где K – число сегментов хеш – таблицы,
@@ -22,7 +22,43 @@ Search - поиск записи в файле.
 4.	АТД «Плотный индекс файла». Записи закрепленные. Ключ записи - вещественное число.
 */
 
+#include <Windows.h>
+#include "FileBase.h"
 
 int main() {
+	SetConsoleOutputCP(1251);
+	SetConsoleCP(1251);
+
+	std::ofstream ("my_base.bin");
+	std::ofstream ("idx_my_base.bin");
+	int b = 10;
+	FileBase a("my_base.bin", 10);
+	char ch[256];
+	int sz = 256;
+	for (int i = 0; i < sz; ++i) {
+		ch[i] = i;
+	}
+	srand(time(NULL));
+	int N = 1000000;
+	for (int i = 0; i < N; ++i) {
+		a.insert_item(ch, 1 + rand() % 256);
+	}
+	int del = rand() % N;
+	for (int i = 0; i < del; ++i) {
+		try {
+			a.delete_item(rand() % N);
+		}
+		catch (std::exception ex) {
+			std::cout << ex.what() << std::endl;
+		}
+	}
+		/*a.insert_item(&b, sizeof(b));
+		a.delete_item(1);
+		a.insert_item(&b, sizeof(b));
+		a.delete_item(2);*/
+//		a.delete_item(1);
+	/*for (int i = 0; i < 20; ++i) {
+		b.write((char*)&i, sizeof(int));
+	}*/
 	return 0;
 }

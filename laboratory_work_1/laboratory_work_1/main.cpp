@@ -21,9 +21,8 @@ int main() {
 	Fraction b(f);
 	Fraction c(1115, 213, "тысяча сто пятнадцать двухсот тринадцатых");
 
-	Fraction *p = c.addition(b);
-	p->print();
-	delete p;
+	Fraction p = c.addition(b);
+	p.print();
 	
 	c.print();
 	f.print();

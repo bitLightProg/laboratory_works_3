@@ -1,21 +1,33 @@
 ﻿#include "Fraction.h"
 
-Fraction::Fraction() : numerator(0), denominator(1), name(nullptr) {
+Fraction::Fraction() : numerator(0), denominator(1), name(nullptr), next(nullptr) {
 	std::cout << "In Fraction()" << std::endl;
 }
 
-Fraction::Fraction(int nu, unsigned int d, const char *n) : numerator(nu), denominator(d) {
-	unsigned int ln = strlen(n);
-	name = new char[ln + 1];
-	memcpy(name, n, ln + 1);
+Fraction::Fraction(int nu, unsigned int d, const char* n, Fraction* next)
+	: numerator(nu), denominator(d), next(next) {
+	if (denominator == 0) {
+		denominator = 1;
+	}
+	if (n != nullptr) {
+		unsigned int ln = strlen(n);
+		name = new char[ln + 1];
+		memcpy(name, n, ln + 1);
+	}
+	else { name = nullptr; }
 
-	std::cout << "In Fraction(int, int, const char*)" << std::endl;
+	std::cout << "In Fraction(int, uint, const char*)" << std::endl;
 }
 
-Fraction::Fraction(const Fraction &f) : numerator(f.numerator), denominator(f.denominator) {
-	unsigned int ln = strlen(f.name);
-	name = new char[ln + 1];
-	memcpy(name, f.name, ln + 1);
+Fraction::Fraction(const Fraction& f) : numerator(f.numerator), denominator(f.denominator), next(f.next) {
+	if (f.name != nullptr) {
+		unsigned int ln = strlen(f.name);
+		name = new char[ln + 1];
+		memcpy(name, f.name, ln + 1);
+	}
+	else {
+		name = nullptr;
+	}
 
 	std::cout << "In Fraction(const Fraction&)" << std::endl;
 }
@@ -27,7 +39,7 @@ Fraction::~Fraction() {
 	std::cout << "In ~Fraction()" << std::endl;
 }
 
-void Fraction::concat(char *&a, const char *b) {
+void Fraction::concat(char*& a, const char* b) {
 	if (b == nullptr) {
 		return;
 	}
@@ -49,10 +61,11 @@ void Fraction::concat(char *&a, const char *b) {
 	a = ch;
 }
 
-Fraction Fraction::addition(const Fraction &a) {
+Fraction Fraction::addition(const Fraction& a) {
 	if (name == nullptr || a.name == nullptr) {
-		std::cout << "Wrong numbers" << std::endl;
-		return Fraction();
+		std::cout << "Wrong number" << std::endl;
+		//Лабораторная работа №6.
+		throw std::runtime_error("Uninitialised number");
 	}
 	int nu = numerator*a.denominator + a.numerator * denominator;
 	unsigned int d = denominator * a.denominator;
@@ -69,33 +82,9 @@ Fraction Fraction::addition(const Fraction &a) {
 const char* Fraction::get_name() const {
 	if (name == nullptr) {
 		std::cout << "Wrong number" << std::endl;
-		return nullptr;
+		//Лабораторная работа №6.
+		throw std::runtime_error("Uninitialised number");
 	}
-	/*const int max_num = 22;
-	unsigned int ln_n = strlen(name);
-	char *ch = new char[max_num + ln_n + 4];
-	_itoa(numerator, ch, 10);
-	unsigned int ln = strlen(ch);
-
-	if (denominator != 1 && numerator != 0) {
-	ch[ln] = '/';
-	_itoa(denominator, ch + ln + 1, 10);
-	ln = strlen(ch);
-	}
-
-	ch[ln] = ' ';
-	ch[ln + 1] = '(';
-	memcpy(ch + ln + 2, name, ln_n + 1);
-	ln = strlen(ch);
-	ch[ln] = ')';
-	ch[ln + 1] = '\0';
-
-	char *returning = new char[ln + 3];
-	memcpy(returning, ch, ln + 3);
-
-	delete[] ch;
-
-	return returning;*/
 	return name;
 }
 
@@ -115,11 +104,15 @@ void Fraction::print() {
 		}
 
 		std::cout << "value = " << ch << " (" << n << ")" << std::endl;
-		/*delete[] ch;*/
+	}
+	else {
+		std::cout << "Uninitialised number" << std::endl;
+		//Лабораторная работа №6.
+		throw std::runtime_error("Uninitialised number");
 	}
 }
 
-Fraction Fraction::operator=(const Fraction &a) {
+Fraction Fraction::operator=(const Fraction& a) {
 	if (this == &a) {
 		return *this;
 	}
@@ -128,20 +121,24 @@ Fraction Fraction::operator=(const Fraction &a) {
 	}
 	numerator = a.numerator;
 	denominator = a.denominator;
-	unsigned int ln = strlen(a.name);
-	name = new char[ln + 1];
-	memcpy(name, a.name, ln + 1);
+	if (a.name != nullptr) {
+		unsigned int ln = strlen(a.name);
+		name = new char[ln + 1];
+		memcpy(name, a.name, ln + 1);
+	}
+	else { name = nullptr; }
 	return *this;
 }
 
-Fraction Fraction::operator+(const Fraction &a) {
+Fraction Fraction::operator+(const Fraction& a) {
 	return addition(a);
 }
 
-Fraction operator-(const Fraction &a, const Fraction &b) {
+Fraction operator-(const Fraction& a, const Fraction& b) {
 	if (a.name == nullptr || b.name == nullptr) {
-		std::cout << "Wrong numbers" << std::endl;
-		return Fraction();
+		std::cout << "Wrong number" << std::endl;
+		//Лабораторная работа №6.
+		throw std::runtime_error("Uninitialised number");
 	}
 	int nu = a.numerator*b.denominator - b.numerator * a.denominator;
 	unsigned int d = a.denominator * b.denominator;
@@ -156,6 +153,11 @@ Fraction operator-(const Fraction &a, const Fraction &b) {
 }
 
 Fraction& Fraction::operator++() {
+	if (name == nullptr) {
+		std::cout << "Wrong number" << std::endl;
+		//Лабораторная работа №6.
+		throw std::runtime_error("Uninitialised number");
+	}
 	numerator += denominator;
 	concat(name, " + ");
 	concat(name, "один");
@@ -163,6 +165,11 @@ Fraction& Fraction::operator++() {
 }
 
 Fraction Fraction::operator++(int) {
+	if (name == nullptr) {
+		std::cout << "Wrong number" << std::endl;
+		//Лабораторная работа №6.
+		throw std::runtime_error("Uninitialised number");
+	}
 	Fraction temp(*this);
 	numerator += denominator;
 	concat(name, " + ");
@@ -170,11 +177,17 @@ Fraction Fraction::operator++(int) {
 	return temp;
 }
 
+bool Fraction::operator<(const Fraction& a) {
+	if (double(*this) < double(a))
+		return true;
+	else return false;
+}
+
 Fraction::operator double() const {
 	return (double)numerator / denominator;
 }
 
-std::ostream& operator<<(std::ostream &os, Fraction &f) {
+std::ostream& operator<<(std::ostream& os, const Fraction& f) {
 	const char *n = f.get_name();
 	if (n != nullptr) {
 
@@ -191,10 +204,15 @@ std::ostream& operator<<(std::ostream &os, Fraction &f) {
 
 		os << ch << " (" << n << ")";
 	}
+	else {
+		std::cout << "Wrong number" << std::endl;
+		//Лабораторная работа №6.
+		throw std::runtime_error("Uninitialised number");
+	}
 	return os;
 }
 
-std::istream& operator>>(std::istream &is, Fraction &f) {
+std::istream& operator>>(std::istream& is, Fraction& f) {
 	is >> f.numerator;
 	char ch = is.get();
 	if (ch == '/') {
@@ -229,13 +247,18 @@ std::istream& operator>>(std::istream &is, Fraction &f) {
 	return is;
 }
 
-void Fraction::write(std::ostream &os) {
+void Fraction::write(std::ostream& os) {
+	if (name == nullptr) {
+		std::cout << "Wrong number" << std::endl;
+		//Лабораторная работа №6.
+		throw std::runtime_error("Uninitialised number");
+	}
 	os.write(reinterpret_cast<const char*>(&numerator), sizeof(numerator));
 	os.write(reinterpret_cast<const char*>(&denominator), sizeof(denominator));
 	os.write(name, strlen(name) + 1);
 }
 
-void Fraction::read(std::istream &is) {
+void Fraction::read(std::istream& is) {
 	is.read(reinterpret_cast<char*>(&numerator), sizeof(numerator));
 	is.read(reinterpret_cast<char*>(&denominator), sizeof(denominator));
 
@@ -243,7 +266,7 @@ void Fraction::read(std::istream &is) {
 	int i = 0;
 	std::streampos s = is.tellg();;
 	while ((ch = is.get()) != '\0') {
-			i++;
+		i++;
 	}
 
 	is.seekg(s);
@@ -252,4 +275,15 @@ void Fraction::read(std::istream &is) {
 	}
 	name = new char[i + 1];
 	is.read(name, i + 1);
+}
+
+Fraction* Fraction::copy() {
+	Fraction* returning = new Fraction(*this);
+	return returning;
+}
+
+bool Fraction::operator==(Fraction& f) {
+	if (f.numerator == numerator && f.denominator == denominator)
+		return true;
+	else return false;
 }
