@@ -42,8 +42,8 @@ public:
 	/*Удаляет запись по ключу.*/
 	void delete_item(float key);
 	/*Записывает элемент, находящийся в файле на позиции pos, в память.
-	Указатель dest будет указывать на выгруженный элемент.*/
-	void get_item(void*& dest, std::streampos pos);
+	Возвращает указатель на выгруженный элемент.*/
+	void* get_item(std::streampos pos);
 	/*Стирание удаленных записей из базы данных. Не соответсвует принципам закреплённых записей.*/
 	void compress();
 
@@ -54,7 +54,6 @@ private:
 
 	float* get_item(int item);
 	void flush_block(int block);
-	//void flush_block(std::streampos pos);
 	void get_block(int block);
 	void get_block(std::streampos pos);
 

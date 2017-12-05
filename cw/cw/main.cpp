@@ -24,6 +24,7 @@ Search - поиск записи в файле.
 
 #include <Windows.h>
 #include "FileBase.h"
+#include "Fraction.h"
 
 int main() {
 	SetConsoleOutputCP(1251);
@@ -33,7 +34,11 @@ int main() {
 	std::ofstream ("idx_my_base.bin");
 	int b = 10;
 	FileBase a("my_base.bin", 10);
-	char ch[256];
+	Fraction c(0,1,"Один");
+	a.insert_item(&c);
+	float random_float = 1 + rand();
+	std::cout << RAND_MAX << std::endl;
+	/*char ch[256];
 	int sz = 256;
 	for (int i = 0; i < sz; ++i) {
 		ch[i] = i;
@@ -51,14 +56,17 @@ int main() {
 		catch (std::exception ex) {
 			std::cout << ex.what() << std::endl;
 		}
-	}
-		/*a.insert_item(&b, sizeof(b));
-		a.delete_item(1);
-		a.insert_item(&b, sizeof(b));
-		a.delete_item(2);*/
-//		a.delete_item(1);
-	/*for (int i = 0; i < 20; ++i) {
-		b.write((char*)&i, sizeof(int));
 	}*/
+	for (int j = 0; j < 100; ++j) {
+		float rn = 0;
+		int num = rand() % 2;
+		for (int i = 0; i < 7; ++i) {
+			rn += num*pow(10, 6 - i);
+			num = rand() % 10;
+		}
+		rn /= 1000000;
+		std::cout << rn << std::endl;
+	}
+	
 	return 0;
 }

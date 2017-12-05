@@ -40,7 +40,7 @@ void FileBase::open(const char* name, int idx_count, bool locked) {
 		base.open(name, mode);
 		idx.open(temp, mode);
 		if (!base || !idx)
-			throw Bad_Open("Couldn't open the base.");//std::exception("Couldn't open the base.");
+			throw Bad_Open("Couldn't open the base.");
 	}
 	catch (std::exception ex) {
 		std::cerr << ex.what() << std::endl;
@@ -69,15 +69,11 @@ void FileBase::open(const char* name, int idx_count, bool locked) {
 		}
 		max_key = *((float*)it);
 		cur_block = (max_key-1) / count;
-		//delete buf;
-
 	}
 	else { 
-		//max_key = 0;
 		item_size = sizeof(float) + sizeof(adress);
 		block_size = item_size*count;
 		buf = new char[block_size];
-		//cur_block = -1;
 	}
 }
 
@@ -90,16 +86,13 @@ float FileBase::insert_item(void* data, int size) {
 		idx.write((char*)&count, sizeof(int));
 		idx.write((char*)&beg, sizeof(adress));
 		idx.write((char*)&tail, sizeof(adress));
-		//idx.flush();
 	}
 
-	/*Размер элемента.*/
-	//int item_size = sizeof(float) + sizeof(adress);
-	//int block_size = item_size*count;
 	/*В каком блоке находится элемент.*/
 	int block_pos = (max_key - 1) / count;
 	/*Позиция блока.*/
 	std::streampos p(sizeof(int) + 2 * sizeof(adress) + block_pos*block_size);
+	/*Вставка на место первой удаленной записи, если они незакреплённые.*/
 	if (!is_locked) {
 		float result = insert_on_deleted(data, size);
 		if (result != 0)
@@ -124,8 +117,9 @@ float FileBase::insert_item(void* data, int size) {
 		}
 		cur_block = block_pos;
 	}
+
 	/*Куда будет записываться новые ключ и адрес.*/
-	float* item = get_item(((int)max_key - 1) % count);//(float*)(buf + ((((int)max_key - 1) % count)*item_size));
+	float* item = get_item(((int)max_key - 1) % count);
 	*item = max_key;
 	item++;
 
@@ -133,11 +127,6 @@ float FileBase::insert_item(void* data, int size) {
 	base.write((char*)&size, sizeof(int));
 	*((adress*)item) = base.tellp();
 	base.write((char*)data, size);
-	/*Запись блока.*/
-	//idx.seekp(p);
-	//idx.write(buf, block_size);
-
-	//delete buf;
 	
 	return max_key;
 }
@@ -159,20 +148,18 @@ std::streampos FileBase::search_item(float key) {
 		std::streampos pp = idx.tellg();
 		if (p >= pp) {
 			//Такого элемента нет.
-			throw std::exception("No such item.");
-			//return std::streampos(-1);
+			throw Bad_Item("No such item.");
 		}
-
+		flush_block(cur_block);
 		get_block(p);
 	}
 
-	float* item = get_item(((int)key - 1) % count);//(float*)(buf + ((((int)key - 1) % count)*item_size));
+	float* item = get_item(((int)key - 1) % count);
 	if (*item != key) {
 		//Такого элемента нет.
 		if (int(*item) == 0)
-			throw std::exception("No such item.");
-		else throw std::exception("Item is deleted");
-		//return std::streampos(-1);
+			throw Bad_Item("No such item.");
+		else throw Bad_Item("Item is deleted");
 	}
 	else {
 		item++;
@@ -182,7 +169,7 @@ std::streampos FileBase::search_item(float key) {
 		base.read((char*)&size, sizeof(int));
 		base.seekp(0, std::ios::end);
 		if (size <= 0) {
-			throw std::exception("Item is deleted");
+			throw Bad_Item("Item is deleted");
 		}
 		return std::streampos(*((adress*)item));
 	}	
@@ -205,12 +192,15 @@ void FileBase::delete_item(float key) {
 		get_block(p);
 	}
 
-	float* item = get_item(((int)key - 1) % count);//(float*)(buf + ((((int)key - 1) % count)*item_size));
+	float* item = get_item(((int)key - 1) % count);
 	if (*item != key) {
 		//Такого элемента нет.
-		throw Bad_Item("No such item.");
+		if (int(*item) == 0)
+			throw Bad_Item("No such item.");
+		else throw Bad_Item("Item is deleted");
 	}
 	else {
+		/*Вставка в список удалённых элементов.*/
 		if (tail != 0) {
 			std::streampos tail_pos(tail + sizeof(float));
 			idx.seekp(tail_pos);
@@ -228,6 +218,7 @@ void FileBase::delete_item(float key) {
 		(*item) += 0.1;
 
 		++item;
+		/*Запись отрицательного размера в базу данных.*/
 		base.seekg((*(adress*)item) - sizeof(int));
 		int size;
 		base.read((char*)&size, sizeof(int));
@@ -239,35 +230,40 @@ void FileBase::delete_item(float key) {
 
 }
 
-void FileBase::get_item(void* &dest, std::streampos pos) {
+void* FileBase::get_item(std::streampos pos) {
 	adress p = (adress)pos;
-	if (dest)
-		delete[] dest;
 	if (p < sizeof(int)) {
 		//Неверный адрес.
-		return;
+		return nullptr;
 	}
+	base.seekg(0, std::ios::end);
+	std::streampos position = base.tellg();
+	if (pos > position) {
+		//Неверный адрес.
+		return nullptr;
+	}
+
 	base.seekg(p - sizeof(int));
 	int ln;
 	base.read((char*)&ln, sizeof(int));
-	dest = new char[ln];
-	base.read((char*)dest, ln);
+	if (ln < 0) {
+		//Запись удалена.
+		return nullptr;
+	}
+	char* ret = new char[ln];
+	base.read((char*)ret, ln);
+	return ret;
 }
 
-void FileBase::compress() {
-	
-	//const char* name = ((path.filename()).string()).c_str();
+void FileBase::compress() {	
 	namespace fs = std::experimental::filesystem::v1;
+
 	fs::path path = fs::current_path();
 	char* temp = new char[strlen(name) + 6];
 	memcpy(temp, "tmp_", 5);
 	int i, j;
 	strcat(temp, name);
-	//strcat(temp, name);
-	//path.replace_filename(temp);
-	//std::experimental::filesystem::v1::path new_path;
-	//new_path.assign(temp);
-	//fs::create_directory(path / temp);
+	/*Переименования файла во временный.*/
 	base.close();
 	fs::rename(path / name, path / temp);
 	std::ifstream in(temp, std::ios::binary);
@@ -276,7 +272,7 @@ void FileBase::compress() {
 	idx.seekg(0, std::ios::end);
 	adress size = idx.tellg();
 	char* str = new char[128];
-
+	/*Выборочное копирование базы данных.*/
 	for (int i = 0;;++i) {
 		if (sizeof(int) + 2 * sizeof(adress) + i*block_size >= size)
 			break;
@@ -288,7 +284,6 @@ void FileBase::compress() {
 			int integer = *((float*)p);
 			if (*((float*)p) == integer) {
 				in.seekg(*((adress*)(p + sizeof(float))) - sizeof(int));
-				//std::stringstream str;
 				int ln;
 				in.read((char*)&ln, sizeof(int));
 				out.write((char*)&ln, sizeof(int));
@@ -307,89 +302,66 @@ void FileBase::compress() {
 		}
 
 		flush_block(i);
-
 	}
 	in.close();
+	/*Удаление старого файла.*/
 	fs::remove(path / temp);
 	int mode = std::ios::in | std::ios::out | std::ios::binary | std::ios::ate;
 	base.open(name, mode);
-//	fs::rename(path / name, path / temp);
 }
 
+/*
+*
+*
+private:
+*
+*
+*/
 float FileBase::insert_on_deleted(void* data, int size) {
 	int block_pos = (max_key - 1) / count;
 	/*Позиция блока.*/
 	std::streampos p(sizeof(int) + 2 * sizeof(adress) + block_pos*block_size);
 
-	if (block_pos != cur_block) {
-		if (beg != 0) {
-			adress cur = beg;
-			if (beg == tail) {
-				beg = tail = 0;
-				idx.seekp(sizeof(int), std::ios::beg);
-				idx.write((char*)&beg, sizeof(adress));
-				idx.write((char*)&tail, sizeof(adress));
-			}
-			else {
-				std::streampos cur_pos(cur + sizeof(float));
-				idx.seekg(cur_pos);
-				idx.read((char*)&beg, sizeof(adress));
-				idx.seekp(sizeof(int), std::ios::beg);
-				idx.write((char*)&beg, sizeof(adress));
-			}
-
-			cur -= sizeof(int) + 2 * sizeof(adress);
-			int cur_pos = cur / item_size;
-			int block_pos = cur_pos / count;
-			std::streampos p(sizeof(int) + 2 * sizeof(adress) + block_pos*block_size);
-			if (block_pos != cur_block) {
-				flush_block(cur_block);
-				get_block(p);
-			}
-
-			/*Куда будет записываться новые ключ и адрес.*/
-			float* item = get_item(cur_pos % count);//(float*)(buf + ((((int)cur_pos) % count)*item_size));
-			*item -= 0.1;
-			float result = *item;
-			item++;
-
-			/*Запись в базу данных и сохранение индекса.*/
-			base.write((char*)&size, sizeof(int));
-			*((adress*)item) = base.tellp();
-			base.write((char*)data, size);
-			/*Запись блока.*/
-			//idx.seekp(p);
-			//idx.write(buf, block_size);
-
-			//delete buf;
-
-			return result;
-
+	/*Если в списке удалённых элементов есть хотя бы один.*/
+	if (beg != 0) {
+		adress cur = beg;
+		if (beg == tail) {
+			beg = tail = 0;
+			idx.seekp(sizeof(int), std::ios::beg);
+			idx.write((char*)&beg, sizeof(adress));
+			idx.write((char*)&tail, sizeof(adress));
 		}
 		else {
-			return 0;
+			std::streampos cur_pos(cur + sizeof(float));
+			idx.seekg(cur_pos);
+			idx.read((char*)&beg, sizeof(adress));
+			idx.seekp(sizeof(int), std::ios::beg);
+			idx.write((char*)&beg, sizeof(adress));
 		}
 
-		//idx.seekp(p, std::ios::beg);
-
-		//char* buf = new char[block_size];
-		if (cur_block != -1) {
+		cur -= sizeof(int) + 2 * sizeof(adress);
+		int cur_pos = cur / item_size;
+		int block_pos = cur_pos / count;
+		std::streampos p(sizeof(int) + 2 * sizeof(adress) + block_pos*block_size);
+		if (block_pos != cur_block) {
 			flush_block(cur_block);
-		}
-		/*Для выяснения, будет ли это новый блок.*/
-		idx.seekg(0, std::ios::end);
-		std::streampos pp = idx.tellg();
-		/*Если этот блок будет новым.*/
-		if (p == pp) {
-			int i = 0;
-			while (i < block_size)
-				buf[i++] = 0;
-		}
-		else {
 			get_block(p);
 		}
-		cur_block = block_pos;
+
+		/*Куда будут записываться новые ключ и адрес.*/
+		float* item = get_item(cur_pos % count);
+		*item -= 0.1;
+		float result = *item;
+		item++;
+
+		/*Запись в базу данных и сохранение индекса.*/
+		base.write((char*)&size, sizeof(int));
+		*((adress*)item) = base.tellp();
+		base.write((char*)data, size);
+
+		return result;
 	}
+	/*Если до этого ничего не удалялось.*/
 	else {
 		return 0;
 	}
@@ -412,12 +384,6 @@ void FileBase::flush_block(int block) {
 	idx.seekp(pos);
 	idx.write(buf, block_size);
 }
-
-//void FileBase::flush_block(std::streampos pos) {
-//	idx.seekp(pos);
-//	idx.write(buf, block_size);
-//	//idx.flush();
-//}
 
 float* FileBase::get_item(int item) {
 	return (float*)(buf + item_size*item);
