@@ -16,7 +16,7 @@ void* Fraction::get_data() {
 	if (name)
 		str_size = sizeof(name) + 1;
 	
-	char* data;
+	char* data = nullptr;
 	if (str_size != 0)
 		data = new char[field_size + str_size];
 	else data = new char[field_size + sizeof(char*)];

@@ -26,6 +26,7 @@ int main() {
 		i_q.push(i);
 	}
 	t2 = clock();
+	std::cout << "Поэлементное добавление int в очередь." << std::endl;
 	std::cout << t2 - t1 << std::endl;
 	// Поэлементное удаление.
 	t1 = clock();
@@ -33,6 +34,7 @@ int main() {
 		i_q.pop();
 	}
 	t2 = clock();
+	std::cout << "Поэлементное удаление из очереди." << std::endl;
 	std::cout << t2 - t1 << std::endl;
 
 	std::map<int, int> i_m;
@@ -42,6 +44,7 @@ int main() {
 		i_m[i] = i+1;
 	}
 	t2 = clock();
+	std::cout << "Поэлементное добавление int в словарь." << std::endl;
 	std::cout << t2 - t1 << std::endl;
 	m_it1 = i_m.begin();
 	for (; m_it1 != i_m.end(); ++m_it1) {
