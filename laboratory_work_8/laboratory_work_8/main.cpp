@@ -18,6 +18,8 @@
 #include "Fraction.h"
 
 int main() {
+	SetConsoleCP(1251);
+	SetConsoleOutputCP(1251);
 	std::queue<int> i_q;
 	time_t t1, t2;
 	// Поэлементное добавление.
